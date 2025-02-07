@@ -48,6 +48,23 @@
     %numbers=left,
     numbersep=5pt
 }
+% VBA snippet environment
+\lstdefinestyle{vba}{
+    language=[Visual]Basic,
+    basicstyle=\small\ttfamily,
+    keywordstyle=\color{blue},       % Keywords like Dim, Sub, Function
+    commentstyle=\color{gray},       % Comments
+    stringstyle=\color{teal},        % Strings
+    identifierstyle=\color{black},   % Variable names
+    numberstyle=\tiny\color{gray},   % Line numbers
+    keywordstyle=[2]\color{purple},  % VBA built-in functions
+    keywordstyle=[3]\color{orange},  % Operators and special keywords
+    breaklines=true,
+    showstringspaces=false,
+    tabsize=4,
+    %numbers=left,
+    numbersep=5pt
+}
 
 % Lined separator for headings
 \newcommand{\heading}[1]{%
@@ -909,21 +926,6 @@ There is also a linear programming solver built into Excel
 
 \[ \textbf{Data} \rightarrow \textbf{Analyse} \rightarrow \textbf{Solver}\]
 
-\heading{EXCEL MACROS}
-
-You can record and reuse a recorded sequence of steps to automate task (such as formatting etc). All tools can be found in 
-
-\[\textbf{Developer} \rightarrow \textbf{Code}\]
-
-Macros can be recorded with $\textbf{Record Macro}$, they can be edited, renamed, deleted etc by pressing $\textbf{Macros}$. They can be customised further with Visual Basic.
-
-To assign a button to a macro go to 
-
-\[\textbf{Developer} \rightarrow \textbf{Controls} \rightarrow \textbf{Insert} \rightarrow \textbf{Button} \]
-
-\heading{VISUAL BASIC}
-
-to do...
 \vspace*{\fill}
 \end{multicols}
 
@@ -1206,8 +1208,511 @@ This will make the cell value available as a parameter. If the parameter value i
 
 Note: A macro could be set up to refresh automatically when the cell holding the parameter changes value.
 
+\vspace*{\fill}
+\end{multicols}
 
+%EXCEL COURSE ENDED HERE. THE REST OF THE CHEAT SHEET COVERS POWERQUERY WHICH WAS IN IT'S OWN SEPARATE COURSE
 
+\newpage
+% Remove page numbers for this page
+\thispagestyle{empty} 
+\begin{center}   
+{\huge\textbf{VBA for Excel}}\\
+\vspace*{0.75cm}
+\end{center}
+
+\begin{multicols}{3}
+\setlength{\columnseprule}{1pt} % Add vertical line between columns
+
+Many tasks can be automated in Excel using macros. These can be created using the macro recorder, or directly using Visual Basic.
+
+\heading{EXCEL MACROS}
+
+You can record and reuse a recorded sequence of steps (to automate tasks such as formatting). All relevant tools can be found in 
+
+\[\textbf{Developer} \rightarrow \textbf{Code}\]
+
+\begin{center}
+    \underline{Recording a macro}
+\end{center}
+
+Macros can be recorded with $\textbf{Record Macro}$. Clicking this allows you to name the macro, as well as set a shortcut key (optional). Once "OK" is pressed, the recording begins. All steps are recorded until \textbf{Stop Recording} is pressed.
+
+\begin{center}
+    \underline{Running a macro}
+\end{center}
+
+\begin{itemize}
+    \item If a shortcut key has been set, just press it
+    \item To assign a macro to a button, first add a button via \\
+    $\textbf{Developer} \rightarrow \textbf{Controls} \rightarrow \textbf{Insert} \rightarrow \textbf{Button (Form Control)}$,
+    and then pick which macro to assign to the button. 
+    \item Add macros to the quick access toolbar. \\
+    Press the dropdown arrow on the toolbar, then navigate to More Commands, then Choose commands from macros. From this window you can add the macros you want.
+\end{itemize}
+
+\begin{center}
+    \underline{Editing macros}
+\end{center}
+
+Recorded macros are edited using Visual Basic directly. The Visual Basic Editor can be opened via
+\[\textbf{Developer} \rightarrow \textbf{Code} \rightarrow \textbf{Visual Basic}. \]
+The editor opens in a new window. Macros are stored as modules in the "Modules" folder. Double clicking a module opens the VB script.
+
+\begin{center}
+    \underline{Saving workbooks with macros}
+\end{center}
+
+Excel files have file type .xlsx, however if a macro has been created (either via the recorder or directly using VB), then the file must be saved as a .xlsm in order to retain the macros.
+
+\columnbreak
+\heading{VISUAL BASIC - OVERVIEW}
+
+Visual Basic (VB) is an object oriented language. Everything in Excel is an object, e.g. the workbook, the worksheets, cells. The general workflow is to select objects we want to interact with and access methods and properties related to them. \\
+
+As a baby example, to change the value in cell A1 to "Hello", we first select the object (i.e. the cell) and then access its Value property to change it to "Hello". i.e. 
+\begin{lstlisting}[style=vba]
+    Range("A1").Select
+    Selection.Value = "Hello"
+\end{lstlisting}
+
+In Excel, Visual Basic scripts are created in the Visual Basic Editor. The editor is opened using the shortcut Alt + F11, or by navigating to 
+\[\textbf{Developer} \rightarrow \textbf{Code} \rightarrow \textbf{Visual Basic}. \]
+Once opened, using the View dropdown to add the windows "Properties Window", "Project Explorer" is advised (if they are not already open).
+
+\heading{THE IMMEDIATE WINDOW}
+
+This window (enabled under the View tab) is a bit like a terminal. Commands can be written and are immediately run.\\
+
+To return values using commands within the immediate window, they must be prefaced with a "?". For example, to retrieve the value in cell A1:
+
+\begin{lstlisting}[style=vba]
+    'Do not do this, it results in a compile error
+    Range("A1").value 
+    'Do this instead
+    ?Range("A1").value
+\end{lstlisting}
+
+P.S. Comments within VB scripts are started using the ' symbol.
+
+\heading{VBA MODULES}
+
+Modules contain the functions and procedures defining the macros. \\
+
+To add a module, navigate to $\textbf{Insert} \rightarrow \textbf{Module}$. \\
+
+Click into it and add a procedure via $\textbf{Insert} \rightarrow \textbf{Procedure}$ (if you are not clicked into the module fully, this will be greyed out.)
+
+\begin{tcolorbox}[colback=gray!10, colframe=gray!50]
+    \begin{center}
+        \underline{Aside: Sub vs Function}
+    \end{center}
+    When adding a procedure, there is the choice of sub vs function. The difference is roughly the following:
+    \begin{itemize}
+        \item Sub (procedure): Used when you need to execute a series of steps. e.g. modifying a value in a cell. Sub procedures have no return values.
+        \item Function: A block of code that performs calculations and returns a value.
+    \end{itemize}
+\end{tcolorbox}
+
+Procedures can be run by clicking into them and pressing the run button in the ribbon. Alternatively, procedures can be added to buttons (just as explained for macros recorded using the macro recorder).\\
+
+Documentation for any method can be opened by clicking into the method and pressing F1.\\
+
+Breakpoints can be added at any point in the procedure by clicking in the left hand grey bar, in line with the line(s) you wish to break at. This is very useful for debugging. Break points are removed by clicking again.\\
+
+As an example of a (sub) procedure, here is a procedure that creates a pop-up message box displaying the value in the cell A1:
+
+\begin{lstlisting}[style=vba]
+    Public Sub PopUpCellA1()
+        MsgBox (Range("A1").Value)
+    End Sub
+\end{lstlisting}
+\begin{center}
+    \includegraphics[width = 0.6\columnwidth]{images/MsgBoxSub.png}
+\end{center}
+
+\columnbreak
+\heading{VARIABLES}
+
+We do not usually wish to hard code values, instead we want to make use of variables. In VB, variables are declared using the "Dim" keyword. After declaration, they can be initialised with a value. For example,
+
+\begin{lstlisting}[style=vba]
+    Public Sub MyFirstVariable()
+        Dim Person As String
+        Person = "Bob"
+        'A msg box containing the word "Bob".
+        MsgBox(Person)
+    End Sub
+\end{lstlisting}
+Here, String is a data type. Some common types are String, Integer, Boolean (True or False) and Variant, which is a "catch all" type (wiht the drawback of taking up more memory). \\
+
+Furthermore, variables may be combined with text using the ampersand symbol (\&). For example, 
+\begin{lstlisting}[style=vba]
+    Public Sub MyFirstVariable()
+        Dim Person As String
+        Person = "Bob"
+        Dim Age As Integer
+        Age = 25
+        MsgBox (Person & " is " & Age & " years old")
+        'Bob is 25 years old
+    End Sub
+\end{lstlisting}
+
+\heading{USEFUL OBJECTS, METHODS AND PROPERTIES}
+
+\begin{itemize}
+    \item ActiveSheet - accesses the ActiveSheet
+    \begin{itemize}
+        \item .UsedRange - a range object containing all cells that have been used
+        \begin{itemize}
+            \item Rows - a collection of rows within the Used Range. You can access the number of used rows via the .Count attribute.
+            \item Columns - a collection of columns within the Used Range. You can access the number of used columns via the .Count attribute.
+        \end{itemize}
+    \end{itemize}
+    \item ActiveCell - accesses the current active/highlighted cell in the worksheet
+    \begin{itemize}
+        \item .Value - the value of the active cell. This can be used to change it, or for use in conditionals.
+        \item .Offset(a,b) - points to the cell `a' rows below and `b' columns right of the active cell. \\
+        For example, to select the cell below the active cell we would do 
+        \begin{lstlisting}[style=vba]
+    ActiveCell.Offset(1,0).Select
+        \end{lstlisting}
+        \item .Address - the reference for a cell. By default this is an absolute reference e.g. "\$A\$2". To obtain a relative reference use \texttt{ActiveCell.Address(false,false)} instead.
+    \end{itemize}
+    \item Application - accesses the application i.e. Excel itself.
+    \begin{itemize}
+        \item .CutCopyMode - a boolean (True/False). Setting this equal to False clears the clipboard.
+        \item .ScreenUpdating - a boolean (True/False). Whether or not to graphically display the running of the macro on screen. \\
+        Turning this off before the body of the script (and turning it back on at the end) removes "screen flicker".
+    \end{itemize}
+\end{itemize}
+
+\heading{IF AND SELECT CASE}
+
+The format of If statements is as follows
+\begin{lstlisting}[style=vba]
+    If (condition) Then
+        'do something
+    ElseIf (condition) Then        
+        'do something else
+    Else
+        'do something otherwise
+    End If
+\end{lstlisting}
+
+For Select Case, we first select the expression, and then run some steps depending on its value (or in other words, depending on what its case is). The syntax is as follows:
+
+\begin{lstlisting}[style=vba]
+    Select Case expression
+        Case Is =value1
+            ' do when expression = value1      
+        Case Is =value2
+            ' do when expression = value2      
+        'etc
+    End Select        
+\end{lstlisting}
+
+A concrete example of Select Case: 
+\begin{lstlisting}[style=vba]
+    Dim MyValue As String
+    MyValue = ActiveCell.Value
+    Select Case MyValue
+        Case Is = "Hello"
+            MsgBox ("Active cell says Hello")
+        Case Is = "Hey"
+            MsgBox ("Active cell says Hey")
+     End Select  
+\end{lstlisting}
+
+\heading{DO WHILE LOOPS}
+
+To implement a Do While loop which runs a fixed number of times:
+
+\begin{lstlisting}[style=vba]
+    Dim counter As Integer
+    counter = 1
+    
+    Do While counter <= 10
+        'do something 
+        counter = counter + 1 'increment the counter
+    Loop
+\end{lstlisting}
+
+For example, to create an index column (incrementing by 1) we could do 
+\begin{center}
+    \includegraphics[width=\columnwidth]{images/FixedDoWhile.png}
+\end{center}
+
+\heading{FOR EACH \& FOR NEXT}
+
+A For Each loop can be used to do something for each item in a collection (e.g. a range of cells). \\
+
+For example, suppose cells A1:A10 contained numbers from 1 to 10 inclusive and we want to fill the cell next to each value with "It's a 1" if the value is 1, and otherwise fill it with "It's not a 1". This can be done as follows:
+
+\begin{lstlisting}[style=vba]
+Sub IsItA1()
+    Dim cell As Range 'a single cell is technically a range.
+    For Each cell In Range("A1:A10")
+        If cell.Value = 1 Then
+            cell.Offset(0, 1).Value = "It's a 1"
+        Else
+            cell.Offset(0, 1).Value = "It's not a 1"
+        End If
+    Next cell
+End Sub
+\end{lstlisting}
+
+A For Next loop is a numerical counter based loop (usually the integers). the syntax is as follows
+
+\begin{lstlisting}[style=vba]
+    Dim i As Integer
+    For i=1 To 10 
+        'do something
+    Next i
+\end{lstlisting}
+
+To make loops more dynamic you could, for example, use the active sheet's UsedRange object to count the number of columns and/or rows in use. i.e.
+\begin{lstlisting}[style=vba]
+    'number of rows used
+    ActiveSheet.UsedRange.Rows.Count
+    
+    'number of columns used
+    ActiveSheet.UsedRange.Columns.Count    
+\end{lstlisting}
+
+\columnbreak
+\heading{SORTING WITH VBA}
+
+We can sort using the Range.Sort() method. There are many arguments, we will only discuss three. Namely, Key1 (the column to sort by), Order1 (the order), and Header (does the range contain headers?).\\
+
+For example, to select data in columns A:F, and then sort using the data in column C we would do:
+
+\begin{lstlisting}[style=vba]
+    Range("A:F").Sort Key1:=Range("C1"), Order1:=xlAscending, Header:=xlYes   
+\end{lstlisting}
+
+\begin{tcolorbox}[colback=gray!10, colframe=gray!50]
+Four things to observe/note
+\begin{itemize}
+    \item Arguments are passed to a method/function by listing them (no brackets needed). Also, arguments are comma separated. i.e.
+    my\_method arg1, arg2, arg3
+    \item Named arguments are given values using the assignment operator (:=)
+    \item Arguments such as order and headers (a yes or no answer) are given "xl" values, i.e. xlAscending, xlDescending, xlYes, xlNo.
+    \item The Key1 argument is set to be the cell C1 (i.e. Range("C1")). This can be any cell in column C. e.g. Range("C100") would have worked just as well.
+\end{itemize}
+\end{tcolorbox}
+
+\heading{USER INPUT}
+
+User input is obtained using the InputBox object, the first argument is the prompt for the user. i.e.
+
+\begin{lstlisting}[style=vba]
+    Dim UserChoice As String
+    UserChoice = InputBox("What do you choose?")   
+\end{lstlisting}
+
+\begin{center}
+    \underline{Multi-line prompts/strings}
+\end{center}
+
+In many cases, it is useful for the prompt text to the user to be on multiple lines (for example, when creating a list of choices). There are two characters of interest here. \\
+
+The first is the vbCrLf (carriage return and line feed). This creates a new line \\
+
+The second is the underscore (\_) character. It is the line continuation character in VBA, and it allows you to break a long line of code into multiple lines (for example, for readability reasons).\\
+
+One way to create a user input box with multiple lines of prompt is as follows:
+
+\begin{lstlisting}[style=vba]
+Dim UserChoice As String
+Dim LongPrompt As String
+LongPrmpt = "Which option would you like" & vbcrlf & _
+             "Option A" & vbcrlf & _
+             "Option B
+UserChoice = InputBox(LongPrmpt)   
+\end{lstlisting}
+This results in the following:
+\begin{center}
+    \includegraphics[width=0.75\columnwidth]{images/MultiLinePrompt.png}
+\end{center}
+
+\begin{center}
+    \underline{Changing buttons on message boxes}
+\end{center}
+
+By default, the message box (MsgBox) has an "OK" button. The buttons displayed can be customised. For example we can create a Yes/No button as follows:
+
+\begin{lstlisting}[style=vba]
+    Dim Choice As Integer
+    Choice = MsgBox("Yes or No", vbYesNo) 
+\end{lstlisting}
+
+Note: The choice (i.e. clicking either Yes or No) is stored as an Integer. The integer 6 corresponds to the choice of Yes, whereas 7 corresponds to the choice of No.
+
+\begin{center}
+    \underline{Handling errors}
+\end{center}
+
+Pressing "OK" with an empty input or pressing "Cancel" in an InputBox results in an error. To handle this, we need to tell the script what to do when an error occurs. 
+
+This is done by specifying an error handler location using the 'On Error GoTo' statement, which should appear before the code we want to error handle. For example:
+
+\begin{lstlisting}[style=vba]
+        On Error GoTo err
+        Dim Choice As Integer
+        Choice = InputBox("Yes or No")
+        
+        If False Then ' Can't get in here unless through err
+     'place err where the code should go in case of an error. In this case, inside the if block
+     err:
+            MsgBox ("There was an error")
+        End If
+\end{lstlisting}
+
+\heading{WORKING ACROSS MULTIPLE SHEETS}
+
+The "Worksheets" object is a collection of all the worksheets. We can use a For Each loop to apply a set of commands/a macro to each sheet. For example:
+
+\columnbreak
+\begin{lstlisting}[style=vba]
+    Dim ws As Worksheet
+    For Each ws In Worksheets
+        ws.Select
+        'ws is now the active sheet
+        MsgBox (ActiveSheet.Name)
+    Next ws
+\end{lstlisting}
+
+\heading{DYNAMIC SELECTION OF COLUMNS}
+
+Suppose we want to sum the values column A for a number of worksheets. We want to be able to dynamically find the range, rather than hard coding the range for each sheet. \\
+
+In Excel, we have the following four key shortcuts:
+\begin{itemize}
+    \item Ctrl + Down \\
+     Jumps to the last filled cell in the current column before an empty cell
+     \item Ctrl + Right \\
+     Jumps to the last filled cell in the current row before an empty cell.
+     \item Ctrl + Shift + Down \\
+     Selects all the filled cells in the current column from the active cell downward until an empty cell is met.
+     \item Ctrl + Shift + Right \\
+     Selects all the filled cells in the current row from the active cell rightward until an empty cell is met.
+\end{itemize}
+Their corresponding VBA code is:
+\begin{itemize}
+    \item \texttt{ActiveCell.End(xlDown).Select} 
+    \item \texttt{ActiveCell.End(xlToRight).Select}
+    \item \texttt{Range(ActiveCell, ActiveCell.End(xlDown)).Select} 
+    \item \texttt{Range(ActiveCell, ActiveCell.End(xlToRight)).Select} 
+\end{itemize}
+
+\begin{tcolorbox}[colback=gray!10, colframe=gray!50]
+Tip: Finding corresponding VBA code for shortcuts.\\
+
+To find the corresponding VBA code for a keyboard shortcut, record a macro using the macro recorder, press the desired keyboard shortcuts, stop the recording, then view the new VBA script in the Visual Basic Editor. 
+\end{tcolorbox}
+
+\heading{COPYING AND PASTING}
+
+\begin{lstlisting}[style=vba]
+    'To copy
+    Selection.Copy
+    
+    'To paste
+    ActiveCell.Paste
+    
+    'To clear the clipboard
+    Application.CutCopyMode = False
+\end{lstlisting}
+
+\columnbreak
+\heading{USER FORMS}
+
+User forms provide a very flexible and customizable way to take user input and provide interaction within an Excel workbook. \\
+
+Within Visual Basic, go to $\textbf{Insert} \rightarrow \textbf{User Form}$. This opens a window which looks like:
+\begin{center}
+    \includegraphics[width=0.6\columnwidth]{images/UserForm.png}
+\end{center}
+The toolbox contains components such as labels, buttons, combo boxes (a.k.a. dropdown menus), list boxes and more. \\
+
+Once components are added to the user form, use the "Properties" window to edit them. The property "(name)" is especially important, as this is how the component will be referenced in scripts. \\
+
+\begin{center}
+    \underline{Event handling with user forms using script}
+\end{center}
+
+Double clicking anywhere in the user form opens a new window where event handling procedures can be added. Use the dropdown menus at the top of the window to choose components and events. Some common examples are: 
+\begin{itemize}
+    \item \textbf{ComboBox} – \textbf{Change}\\
+    Runs when the selected item changes
+    \item \textbf{Button} – \textbf{Click} \\
+    Runs when the button is clicked
+    \item \textbf{UserForm} – \textbf{Activate} \\
+    Runs when the form becomes active
+\end{itemize}
+
+\begin{tcolorbox}[colback=gray!10, colframe=gray!50]
+Within this script, the user form itself can be referred to using the "me" keyword. (This is analogous to "self" in Python, or "this" in C\#).
+\end{tcolorbox}
+
+As an example, here is a user form with a button that when clicked will create a new sheet and allow the user to name it.
+
+\begin{center}
+    \includegraphics[width=\columnwidth]{images/UserFormEg.png}
+\end{center}
+
+\begin{tcolorbox}[colback=gray!10, colframe=gray!50]
+Clicking on "ThisWorkbook" in the VBA project explorer allows events that involve the workbook itself to be handled, such as $\textbf{Workbook} - \textbf{Open}$ (which will run when the workbook is opened).
+\end{tcolorbox}
+
+\columnbreak
+\heading{IMPORTING DATA FROM TEXT FILES}
+
+\begin{lstlisting}[style=vba]
+    Dim TextFile As Workbook
+    Set TextFile = Workbooks.Open("C:\Users\...\.txt")
+\end{lstlisting}
+This opens the text file at the given path within an Excel workbook (in a new window).
+
+\begin{tcolorbox}[colback=gray!10, colframe=gray!50]
+The Set keyword:\\
+
+The Set keyword is used (and required) when setting Excel object references. This is in contrast to simply assigning a value (i.e. i = 1) where the set keyword is not needed.
+\end{tcolorbox}
+
+A potential situation when opening text files could be that you want to copy the information and paste it into the original workbook that was open. This is done as follows:
+\begin{lstlisting}[style=vba]
+    Dim TextFile As Workbook
+    Set TextFile = Workbooks.Open("C:\Users\...\.txt")
+    'Copy all content linked to cell A1 of the first sheet of the newly opened workbook
+    TextFile.Sheets(1).Range("A1").CurrentRegion.Copy
+    'Make the original workbook the activate one
+    'As it was open first, it is at index 1 in the workbooks collection
+    Workbooks(1).Activate
+    ActiveSheet.Paste
+    TextFile.Close
+\end{lstlisting}
+
+\begin{center}
+    \underline{Opening (multiple) files using the File Explorer}
+\end{center}
+
+To open a file explorer window and allow the user to select multiple files to open, we can do:
+
+\begin{lstlisting}[style=vba]
+    Dim OpenFiles As Variant
+    OpenFiles = Application.GetOpenFilename(MultiSelect:=True)
+\end{lstlisting}
+
+then we can loop through them, open them, and do whatever
+
+\begin{lstlisting}[style=vba]
+    For Each file in OpenFiles   
+        Set TextFile = Workbooks.Open(file)
+        'do something with TextFile
+    Next file
+\end{lstlisting}
 
 \end{multicols}
 \end{document}
